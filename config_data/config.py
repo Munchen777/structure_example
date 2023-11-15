@@ -10,5 +10,10 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 RAPID_API_KEY = os.getenv("RAPID_API_KEY")
 DEFAULT_COMMANDS = (
     ("start", "Запустить бота"),
-    ("help", "Вывести справку")
+    ("help", "Вывести справку"),
+    ('survey', 'Опрос'),
+    ('history', 'Ваша история запросов'),
+    ('low', 'Фильм с наименьшим рейтингом IMDb'),
+    ('high', 'Фильм с наивысшим рейтингом IMDb')
 )
+DB_PATH = 'database.db'
