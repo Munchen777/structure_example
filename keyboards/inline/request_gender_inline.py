@@ -1,8 +1,8 @@
-from loader import bot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def request_gender():
+    """ Inline-кнопки для запроса пола """
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
     markup.add(InlineKeyboardButton('Мужской', callback_data='мужской'),

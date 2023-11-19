@@ -5,6 +5,3 @@ headers = {
  	"X-RapidAPI-Key": RAPID_API_KEY,
  	"X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
 }
-
-# response = requests.get(url, headers=headers)
-# print(response.json())

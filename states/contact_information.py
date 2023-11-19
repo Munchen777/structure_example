@@ -9,3 +9,7 @@ class UserInfoState(StatesGroup):
     gender: str = State()
     country: str = State()
     phone_number: Contact = State()
+
+
+class UserFilmResponse(StatesGroup):
+    film_year: int = State()
