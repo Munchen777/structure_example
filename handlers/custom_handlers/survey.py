@@ -21,7 +21,7 @@ def get_name(message: Message) -> None:
     name = message.text
     if name.isalpha():
 
-        bot.send_message(message.from_user.id, f'👍Спасибо. Теперь введи свой возраст:')
+        bot.send_message(message.from_user.id, f'👍Спасибо. Теперь введи свой возраст (от 10 до 120):')
         bot.set_state(message.from_user.id, UserInfoState.age, message.chat.id)
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['name'] = message.text
@@ -35,12 +35,16 @@ def get_age(message: Message) -> None:
     """ Принимаем от пользователя возраст """
     user_age = message.text
     if user_age.isdigit():
+        if int(user_age) in range(10, 121):
 
-        bot.send_message(message.from_user.id, f'Спасибо, записал. Теперь укажи свой пол.',
-                         reply_markup=request_gender())
-        bot.set_state(message.from_user.id, UserInfoState.gender, message.chat.id)
-        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-            data['age'] = message.text
+            bot.send_message(message.from_user.id, f'Спасибо, записал. Теперь укажи свой пол.',
+                             reply_markup=request_gender())
+            bot.set_state(message.from_user.id, UserInfoState.gender, message.chat.id)
+            with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+                data['age'] = message.text
+
+        else:
+            bot.send_message(message.from_user.id, f'Извините, вы вышли за возрастные ограничения.')
     else:
         bot.send_message(message.from_user.id, f'Возраст должен состоять из цифр.')
 
