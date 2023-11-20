@@ -1,5 +1,6 @@
 import requests
 from config_data.api import url, headers
+from database.get_user_info import get_user_by_id
 from database.models import *
 from loader import bot
 from telebot.types import Message
@@ -27,7 +28,7 @@ def get_year(message: Message):
     if not films_with_such_year:
         bot.reply_to(message, f'🤷К сожалению, фильм с годом съемки {user_year} года не найден.')
 
-    user = User.get(User.telegram_id == message.from_user.id)
+    user = get_user_by_id(user_id=message.from_user.id)
     for film in films_with_such_year:
         FilmInfo.create(
             film_name=film['title'],
@@ -43,4 +44,3 @@ def get_year(message: Message):
                                                f'Изображение: ⬇️')
         bot.send_photo(message.from_user.id, requests.get(film['big_image']).content)
     bot.delete_state(message.from_user.id, message.chat.id)
-

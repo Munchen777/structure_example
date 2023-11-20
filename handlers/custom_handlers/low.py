@@ -1,6 +1,6 @@
 import requests
-import sqlite3
 from config_data.api import url, headers
+from database.get_user_info import get_films_from_table, get_user_by_id
 from database.models import *
 from loader import bot
 from telebot.types import Message
@@ -25,7 +25,7 @@ def get_low_film(message: Message):
     film_genre = low_rate_film['genre']
     film_description = low_rate_film['description']
 
-    user = User.get(User.telegram_id == message.from_user.id)
+    user = get_user_by_id(user_id=message.from_user.id)
     bot.reply_to(message, f'Уже в процессе - ищу 👀')
     FilmInfo.create(
         film_name=name_film,
@@ -34,10 +34,8 @@ def get_low_film(message: Message):
         film_rating=low_film_rating,
         film_year=low_film_year
     ).save()
-    with sqlite3.connect('database.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""SELECT * FROM films""")
-        print(cursor.fetchall())
+
+    get_films_from_table()
 
     bot.send_message(message.from_user.id, f'🕵️‍♂️ Нашел для вас фильм/мультфильм с низким рейтингом IMDb Top 100.')
     bot.send_message(message.from_user.id, f'✍️Жанр фильма/мультфильма: {', '.join(film_genre)}')
@@ -46,5 +44,3 @@ def get_low_film(message: Message):
     bot.send_photo(message.from_user.id, requests.get(url_image).content)
 
     bot.delete_state(message.from_user.id, message.chat.id)
-
-

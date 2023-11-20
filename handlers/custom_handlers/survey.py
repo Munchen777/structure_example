@@ -1,4 +1,4 @@
-import sqlite3
+from database.get_user_info import get_users_from_table
 from database.models import *
 from keyboards.inline.request_gender_inline import request_gender
 from keyboards.reply.contact import get_contact
@@ -44,7 +44,8 @@ def get_age(message: Message) -> None:
                 data['age'] = message.text
 
         else:
-            bot.send_message(message.from_user.id, f'Извините, вы вышли за возрастные ограничения.')
+            bot.send_message(message.from_user.id, f'Извините, вы вышли за возрастные ограничения.'
+                                                   f' Введите возраст еще раз.')
     else:
         bot.send_message(message.from_user.id, f'Возраст должен состоять из цифр.')
 
@@ -75,11 +76,7 @@ def reply_callback_phone(message: Message):
                     gender=data['gender'],
                     phone=data['contact']).save()
 
-    with sqlite3.connect('database.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""SELECT * FROM users""")
-        print(cursor.fetchall())
-
+    get_users_from_table()
 
     bot.reply_to(message, f'Ваш номер телефона: {data['contact']}')
     bot.delete_state(message.from_user.id, message.chat.id)

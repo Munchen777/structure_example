@@ -1,6 +1,7 @@
+import datetime
 from peewee import *
 from config_data.config import DB_PATH
-import datetime
+
 db = SqliteDatabase(DB_PATH)
 
 
@@ -45,5 +46,6 @@ class FilmInfo(BaseModel):
         db_table = 'films'
 
 
-db.create_tables([User, FilmInfo])
-
+tables = [User, FilmInfo]
+if not all(i.table_exists() for i in tables):
+    db.create_tables(tables)
