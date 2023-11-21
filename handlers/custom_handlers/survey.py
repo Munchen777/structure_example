@@ -3,7 +3,7 @@ from database.models import *
 from keyboards.inline.request_gender_inline import request_gender
 from keyboards.reply.contact import get_contact
 from loader import bot
-from telebot.types import Message
+from telebot.types import Message, ReplyKeyboardRemove
 from states.contact_information import UserInfoState
 
 
@@ -77,6 +77,7 @@ def reply_callback_phone(message: Message):
                     phone=data['contact']).save()
 
     get_users_from_table()
+    bot.send_message(message.from_user.id, f'Ваш номер телефона: {data['contact']}',
+                     reply_markup=ReplyKeyboardRemove())
 
-    bot.reply_to(message, f'Ваш номер телефона: {data['contact']}')
     bot.delete_state(message.from_user.id, message.chat.id)

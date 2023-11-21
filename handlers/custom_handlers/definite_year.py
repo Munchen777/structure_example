@@ -1,7 +1,8 @@
 import requests
+from config_data.get_response import get_response
 from config_data.api import url, headers
-from database.get_user_info import get_user_by_id
-from database.models import *
+from database.get_user_info import (get_user_by_id,
+                                    films_table_create)
 from loader import bot
 from telebot.types import Message
 from states.contact_information import UserFilmResponse
@@ -18,7 +19,7 @@ def ask_user_to_give_a_year(message: Message):
 def get_year(message: Message):
     user_year = int(message.text)
 
-    response = requests.get(url, headers=headers)
+    response = get_response(url, headers)
     if response.status_code != 200:
         bot.send_message(message.from_user.id, f'😔К сожалению, не удалось получить список фильмов.')
 
@@ -30,13 +31,14 @@ def get_year(message: Message):
 
     user = get_user_by_id(user_id=message.from_user.id)
     for film in films_with_such_year:
-        FilmInfo.create(
-            film_name=film['title'],
-            user=user.id,
-            user_id_for_table=message.from_user.id,
-            film_rating=film['rating'],
-            film_year=film['year']
-        ).save()
+
+        films_table_create(film_name=film['title'],
+                           user=user.id,
+                           user_id=message.from_user.id,
+                           rating=film['rating'],
+                           year=film['year']
+                           )
+
         film_genre = film['genre']
         bot.send_message(message.from_user.id, f'🆒Название: {film['title']}\n'
                                                f'✍️Жанр фильма/мультфильма: {', '.join(film_genre)}'

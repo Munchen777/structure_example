@@ -1,3 +1,4 @@
+from database.get_user_info import check_user_id_in_films_table
 from database.get_user_info import get_films_from_table
 from database.models import *
 from loader import bot
@@ -6,7 +7,7 @@ from telebot.types import Message
 
 @bot.message_handler(commands=['history'])
 def user_history(message: Message):
-    if not User.get(message.from_user.id == FilmInfo.user.telegram_id):
+    if not check_user_id_in_films_table(message_id=message.from_user.id):
         bot.send_message(message.from_user.id, f'У вас пустая история запросов')
 
     history = FilmInfo.select().where(FilmInfo.user_id_for_table == message.from_user.id)

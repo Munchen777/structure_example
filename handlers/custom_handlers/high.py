@@ -1,7 +1,9 @@
 import requests
+from config_data.get_response import get_response
 from config_data.api import url, headers
-from database.get_user_info import get_films_from_table, get_user_by_id
-from database.models import *
+from database.get_user_info import (get_films_from_table,
+                                    get_user_by_id,
+                                    films_table_create)
 from loader import bot
 from telebot.types import Message
 
@@ -9,9 +11,9 @@ from telebot.types import Message
 @bot.message_handler(commands=['high'])
 def get_low_film(message: Message):
     """ Команда /high покажет вам какой фильм занимает топ в рейтинге с высоким рейтингом IMDb. """
-    response = requests.get(url, headers=headers)
+    response = get_response(url, headers)
     if response.status_code != 200:
-        bot.send_message(message.from_user.id, f'К сожалению, не удалось получить список фильмов.')
+        bot.send_message(message.from_user.id, f'😔К сожалению, не удалось получить список фильмов.')
 
     films = response.json()
     """ Сам фильм и его параметры """
@@ -28,13 +30,12 @@ def get_low_film(message: Message):
     user = get_user_by_id(user_id=message.from_user.id)
     bot.reply_to(message, f'Уже в процессе - ищу 👀')
 
-    FilmInfo.create(
-        film_name=name_film,
-        user=user.id,
-        user_id_for_table=user_id,
-        film_rating=high_film_rating,
-        film_year=high_film_year
-    ).save()
+    films_table_create(film_name=name_film,
+                       user=user.id,
+                       user_id=user_id,
+                       rating=high_film_rating,
+                       year=high_film_year
+                       )
 
     get_films_from_table()
 
