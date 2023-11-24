@@ -1,6 +1,6 @@
 import requests
-from config_data.get_response import get_response
-from config_data.api import url, headers
+
+from config_data.get_response import get_film_info
 from database.get_user_info import (get_user_by_id,
                                     films_table_create)
 from loader import bot
@@ -17,21 +17,15 @@ def ask_user_to_give_a_year(message: Message):
 
 @bot.message_handler(state=UserFilmResponse.film_year)
 def get_year(message: Message):
-    user_year = int(message.text)
-
-    response = get_response(url, headers)
-    if response.status_code != 200:
+    result = get_film_info(message, 'definite_year')
+    if not result:
         bot.send_message(message.from_user.id, f'😔К сожалению, не удалось получить список фильмов.')
+        return
 
-    films_lst = response.json()
     bot.reply_to(message, f'🕵️‍♀️Выполняю поиск ...')
-    films_with_such_year = list(filter(lambda elem: elem['year'] == user_year, films_lst))
-    if not films_with_such_year:
-        bot.reply_to(message, f'🤷К сожалению, фильм с годом съемки {user_year} года не найден.')
 
     user = get_user_by_id(user_id=message.from_user.id)
-    for film in films_with_such_year:
-
+    for film in result:
         films_table_create(film_name=film['title'],
                            user=user.id,
                            user_id=message.from_user.id,
@@ -39,10 +33,10 @@ def get_year(message: Message):
                            year=film['year']
                            )
 
-        film_genre = film['genre']
         bot.send_message(message.from_user.id, f'🆒Название: {film['title']}\n'
-                                               f'✍️Жанр фильма/мультфильма: {', '.join(film_genre)}'
+                                               f'✍️Жанр фильма/мультфильма: {', '.join(film['genre'])}\n'
                                                f'💬Краткий сюжет: {film['description']}\n'
+                                               f'🔢Год выхода на экраны: {film['year']}\n'
                                                f'Изображение: ⬇️')
         bot.send_photo(message.from_user.id, requests.get(film['big_image']).content)
     bot.delete_state(message.from_user.id, message.chat.id)
