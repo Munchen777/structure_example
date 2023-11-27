@@ -1,4 +1,5 @@
 import re
+from config_data.config import RESPONSE_WELCOME_PHRASES
 from loader import bot
 from telebot.types import Message
 
@@ -11,9 +12,9 @@ def bot_echo(message: Message):
                     or re.findall(r'[hH]ello', message.text))
     if answer_hello:
         bot.send_message(message.from_user.id,
-                         f'Рад вас видеть, дорогая {message.from_user.username}!')
+                         RESPONSE_WELCOME_PHRASES['hello']['say_hello'].format(
+                             username=message.from_user.username))
     else:
         bot.send_message(
             message.from_user.id,
-            f"Вы заблудились?\n"
-            f"ℹ️Для навигации используйте команду /help. 🙋‍")
+            RESPONSE_WELCOME_PHRASES['hello']['helping_phrase'])
